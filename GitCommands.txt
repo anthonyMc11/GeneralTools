@@ -1,0 +1,26 @@
+Git commands 
+
+Clone 
+git clone {remoteUrl}
+
+Pull
+Git pull {remoteUrl}
+
+Branch and switch (createBranch = true)
+Git checkout -b {branch name}
+Git checkout {branch name)
+
+Commit
+Git commit -m {message}
+
+Push
+Git push 
+
+Push new branch
+Git push --set-upstream origin {branch name}
+
+Stage all
+Git stage -A
+
+Add all
+Git add -A
