@@ -1,0 +1,59 @@
+Command prompt
+
+public static class CommandPrompt
+    {
+        //https://loune.net/2017/06/running-shell-bash-commands-in-net-core/
+        public static string RunCommand( string cmd)
+        {
+            var escapedArgs = cmd.Replace("\"", "\\\"");
+
+            var process = new Process()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = $"/C \"{escapedArgs}\"",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = false,
+                }
+            };
+            process.Start();
+
+            string result = process.StandardOutput.ReadToEnd();
+
+            string error = process.StandardError.ReadToEnd();
+
+            process.WaitForExit();
+            process.Dispose();
+
+            return string.IsNullOrEmpty(error)? result : error;
+        }
+
+        public static string RunCommandWithFileOutput(string cmd, string filepath)
+        {
+            var escapedArgs = cmd.Replace("\"", "\\\"");
+            var escapedFilePath = filepath.Replace("\"", "\\\"");
+
+            var command = $"/C \"{escapedArgs}  > {escapedFilePath}\"";
+
+            var process = new Process()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = command,
+                    RedirectStandardOutput = false,
+                    UseShellExecute = true,
+                    CreateNoWindow = true,
+                }
+            };
+            process.Start();
+
+            process.WaitForExit();
+            process.Dispose();
+
+            return filepath;
+        }
+    }
