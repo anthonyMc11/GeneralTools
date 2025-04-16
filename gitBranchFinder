@@ -1,0 +1,66 @@
+Prompt: 
+write me a powershell script. I want the script to accept a folder path. Then for each folder in the path, iterate through and get the current git branch of that folder, then output the final results in the format '{folderName}|{gitbranch}
+
+Answer:
+Certainly! Below is a PowerShell script that accepts a folder path as an argument, iterates through each
+subdirectory (assuming it's a Git repository), retrieves the current Git branch for each directory, and outputs
+the result in the specified format (`{folderName}|{gitbranch}`).
+
+```powershell
+# Define a function to get the current git branch of a given path
+function Get-GitBranch {
+    param (
+        [string]$path
+    )
+
+    # Check if the directory is a Git repository
+    if (Test-Path "$path\.git\HEAD") {
+        # Read the content of HEAD file to get the current branch reference
+        $headContent = Get-Content "$path\.git\HEAD" -Raw
+        if ($headContent -match 'ref: refs/heads/(.*)') {
+            return $matches[1]
+        } else {
+            return "No branch found"
+        }
+    } else {
+        return "Not a Git repository"
+    }
+}
+
+# Check if a folder path is provided as an argument
+if ($args.Length -eq 0) {
+    Write-Host "Please provide a folder path."
+    exit
+}
+
+$folderPath = $args[0]
+
+# Ensure the provided path exists and is a directory
+if (Test-Path $folderPath -PathType Container) {
+    # Get all subdirectories in the specified path
+    $folders = Get-ChildItem -Path $folderPath -Directory
+
+    foreach ($folder in $folders) {
+        # Get the current git branch for each folder
+        $gitBranch = Get-GitBranch -path $folder.FullName
+        Write-Host "$($folder.Name)|$gitBranch"
+    }
+} else {
+    Write-Host "The provided path is not a valid directory."
+}
+```
+
+### How to Use the Script:
+1. **Save the script**: Save this script in a `.ps1` file, for example, `Get-GitBranches.ps1`.
+2. **Run the script**: Open PowerShell or Windows Terminal and navigate to the folder where you saved the script.
+You can run the script by passing the path to the directory you want to scan as an argument:
+   ```powershell
+   .\Get-GitBranches.ps1 "C:\path\to\your\folder"
+   ```
+3. **Output**: The script will output the folder name and its current Git branch for each subdirectory that is a
+Git repository.
+
+This script assumes that each directory containing a `.git` folder is a Git repository, which should be true if
+you're looking at typical project directories in many version control systems like GitHub or Azure DevOps.
+Adjustments might be needed depending on your specific environment and how other types of repositories are
+structured.
